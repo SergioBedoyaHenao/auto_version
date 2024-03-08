@@ -1,0 +1,34 @@
+name: Automatic_Version
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '14'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Call configure_and_commit.sh
+        run: ./.github/scripts/configure_and_commit.sh ${{ github.event.action }} ${{ github.repository }} ${{ secrets.GH_TOKEN }}
+        id: update_and_reintegrate
+
+      - name: Set Outputs
+        run: |
+          echo "::set-output name=base_branch::${{ steps.update_and_reintegrate.outputs.base_branch }}"
+          echo "::set-output name=branch_name::${{ steps.update_and_reintegrate.outputs.branch_name }}"
+          echo "::set-output name=version::${{ steps.update_and_reintegrate.outputs.version }}"
