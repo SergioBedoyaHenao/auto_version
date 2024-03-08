@@ -4,7 +4,7 @@ GITHUB_EVENT_ACTION="$1"
 GITHUB_REPOSITORY="$2"
 GH_TOKEN="$3"
 
-# Configure Git
+#Configure Git
 git config --global user.email "actions@github.com"
 git config --global user.name "GitHub Actions"
 
@@ -30,10 +30,6 @@ if [[ $base_branch == 'qa' ]]; then
         npm --no-git-tag-version version prerelease --preid=beta
       fi
     fi
-  elif [[ $branch_name == *fix/* ]]; then
-    if [[ $GITHUB_EVENT_ACTION == 'closed' && $(jq -r '.pull_request.merged' "$GITHUB_EVENT_PATH") == 'true' ]]; then
-      npm version prepatch --preid=beta
-    fi
   fi
 elif [[ $base_branch == 'master' ]]; then
   if [[ $branch_name == 'qa' ]]; then
@@ -47,7 +43,6 @@ elif [[ $base_branch == 'master' ]]; then
   fi
 fi
 
-# Set Outputs
 echo "::set-output name=base_branch::$base_branch"
 echo "::set-output name=branch_name::$branch_name"
 
@@ -56,8 +51,6 @@ version=$(npm version)
 echo "::set-output name=version::$version"
 
 # Commit and Push Version Update
-base_branch=${base_branch:-'master'}
-branch_name=${branch_name:-'dev'}
 echo "Base branch: $base_branch"
 echo "Branch name: $branch_name"
 echo "Version: $version"
